@@ -1,0 +1,613 @@
+<div id="gameArea">
+        <div id="scoreBoard">Player: 0 | AI: 0</div>
+        <canvas id="gameCanvas" width="400" height="300"></canvas>
+        <button id="startButton">Start Game</button>
+        <div class="instructions">
+            Tap and drag up/down on the game area to move your paddle
+        </div>
+    </div>
+    
+    <div id="gameOverModal">
+        <div id="gameOverTitle">Game Over!</div>
+        <div id="gameOverMessage">Message goes here</div>
+        <button id="restartButton">Play Again</button>
+    </div>
+    
+    <button id="soundToggle">🔊</button>
+    
+    <!-- Audio elements for sound effects -->
+    <audio id="paddleHitSound" src="data:audio/wav;base64,UklGRqQDAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YYADAAAAAAAAxUPL43LjqPDs8Lr5rgKNAt7ucOI03inWF80jyZa9LbqpuEa3S7dht9671MICytLRqtow5kHytvwmBrEQ1hogJeomNCZrIfccgxQlDJYDA/y69bXvH+v05wbm1+My4t7gf+BL4D3giuDh4JfhZOJ444rldedr6YXr1O1F8MnyufTH9uX4y/qw/HH+GP/P/1MAUQDu/4r/y/7H/Zr8WPsB+qP4RvcZ9v/00fPK8uTxHfGF8EzwdfC38PrwV/G+8Tvyt/JG8w30E/VH9mH3i/iv+dL67Pv+/Pn92/6g/1wA8QCPASkCgALKAv8CJAM1A0MDUANmA4QDsgMDBGAExgQUBSwFcAVpBWoFbQVHBRwF8QSxBHYEMQQNBO4D0gPDA8UDtgOjA4YDXwMtA/cCtwJ0AikC3QGgAWABIQH2AMEA/ABOAZMBugH0ATICVQJzAnYCdQJnAlgCRQI9AjMCLwIsAi0CLgIzAjYCNgI0AjACKAIeAhUCDAIDAvsB9AHrAeMB2gHSAcoBwgG6AbQBrAGmAaABmwGXAZQBkQGPAY4BjQGNAY8BkAGRAZMBlQGYAZsBngGiAaYBqQGtAbEBtQG5Ab0BwgHGAcoBzwHTAdgB3AHhAeUB6gHuAfMB9wH7Af8BAwIHAgsCDwITAhcCGwIeAiECJAIoAisCLgIxAjQCNgI5AjsCPgJAAkICRAJGAkgCSQJLAkwCTQJOAk8CTwJQAlACUQJRAlECUQJRAlACUAJPAk4CTQJMAksCSSJIAkYCRQJDAkACPgI8AjkCNwI0AjICLwIsAikCJgIjAiACHQIaAhYCEwIQAg0CCQIGAgICAQL9AfkB9QHyAe4B6wHnAeQB4AHdAdkB1gHSAc8BywHIAcQBwQG9AboFtgGzAa8BrAGpAaUBogGfAZsBmAGVAZIBjwGMAYkBhgGDAYABfQF6AXcBdAFxAW8BbAFpAWcBZAFiAWABXQFbAVkBVwFVAVMBUQFPAU0BSwFJAUgBRgFEAUMBQQE/AT4BPAa7AToBOAE3ATYBNAEzATIBMQEwAS8BLwEuAS0BLAEsASsBKwEqASoBKQEpASgBKAEoASgBJwEnAScBJwEnAScBJwEnAScBJw=="></audio>
+    <audio id="wallHitSound" src="data:audio/wav;base64,UklGRrQCAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YZACAABNyQAA7f01A0cLYRLWGD8eQCJpJEIlsSP5H0caMRPpCg0CXfnE8IHoAuEX22bWENO40P7ODs5gzUDN3s3TzljQ0tIB1k3ZMN1J4XPlI+pK7n/yzvao+twAawUkCXAMpg/WEe8S7hK0EfgOnQvIBxgDPP6++Vj1XPHp7bLqcufX5NPiMeHA313frt7f3Tfdes9q3vffmeFx41rl0ObN6J/qVuzg7Vbv/fBl8sfz4vQP9hf3q/ju+Tb7qPyh/R/+Af8y/64A8wGPAhMDngP0A3QEwQQHBSAFWwWMBb8F7wUnBlUGkQbJBuEGEwcpB0wHaQeKB54HuQfEB80H3AfPB+cH5QfvB+4H8wcECPUHBwj8BwoI+gcKCP0HDgj6BwsI+AcUCPkHFgj4BxQI+wcUCPEHHAj5BxsI9AcYCPkHHwjvBxMI/QcKCPQHGQj1BxsI7wcaCPQHGgjwBxoI8gcTCPAHFQjvBw0I9AcWCO0HDQfzBwgI7gcVCOsHDAjwBw0I7AcOCOwHDQjrBw0I7QcICO4HCAjtBwcI7AcGCOsHBAjpBwMI6AcCCOcHAQjlB/8H5Qf+B+QH/AfhB/sH4Af5B90H9wfcB/UH2gfzB9gH8gfWB/AH1AfvB9IH7QfQB+wHzQfqB8sH6QfJB+cHxgflB8QH5AfCB+IHvwfgB70H3we6B90HuAfdB7UH2geyB9kHsAfXB60H1QeqB9QHqAfRB6UHzweiB84HoAfLB50HyQebB8gHmQfGB5YHxAeUB8MHkgfAB48HvweNB70HiwE8B4gHugeGB7kHgwe2B4EHtQd/B7MHfAeyB3oHrwd3B64HdQesB3MHqgdxB6gHbweGB6YHbAekB2oHogdoB6AHZgehB2UHnwdkB50HYgabGF8HlwddB5UHWweUB1kHkQdYB5AHVgePB1QHjAdSB4sHUAaJB04HhwdMB4YHSweEB0kHggdIB4AHRwd/B0UHcgdDB3wHQQd6B0AHeQc+B3cHPQd1BzwHdAc7B3MHOQdwBzcHpwc2B24HMwdtBzIHawcwB2oHLwdpBy0HaAwtB2UHKwdkBysHYgcZB2EHKAdfByYHXwclB10HIwdcByIHWwchB1kHIAdYBx4HVwcdB1UHGwdUBxoHUgcZB1EHGAdQBxcHTwUWB00HFQdMBxQHSwcTB0gHEQdIBxAHRgc2B0UHDgdDBw0HQgcMB0EHCQdABwgHPgcHBz4HBgc8BwQHOwcDBzoHAgc4BwEHNgf/BjUH/gY0B/wGMwf7BjIH+QYxB/gGMQf3Bi8H9gYuB/UGLQf0BiwH8gYrB/EGKgfwBikH7wYpB+4GJwftBicH7AYlB+sGJAXqBiQH6AYiB+cGIgfmBiEH5QYgB+QGHwfjBh8H4gYeB+EGHQfgBhwH3wYbB94GGgfdBhkH3AYYB9sGGAfbBhcH2gYWB9kGFQfYBhUH1wYUB9YGEwfVBhIH1QYSAsQGEAfTBhAH0gYOB9EGDgfQBg0HzwYNB84GDAfOBgsHzQYLB8wGCgfLBgkHywYJB8oGCAfJBggHyAYHB8cGBwfGBgYHxgYFB8UGBQfEBgQHxAYDB8MGAwfCBgMHwQYCB8EGAQfABgEHvwYAB78G/wa+Bv8HngA="></audio>
+    <audio id="scoreSound" src="data:audio/wav;base64,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"></audio>
+    <audio id="winSound" src="data:audio/wav;base64,UklGRj4FAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YRoFAAACAAAAOQEAALMCAAAtBAAAqAUAADUHAACVCAAA3gkAACYLAABoDAAApA0AAOwOAAAxEAAAdhEAALESAAD0EwAALRUAAGMWAACYFwAA0BgAAP8ZAAAsGwAAVRwAAIEdAACpHgAAziAQiaeJpoonjGONlY/HkPeRGpM8lF2VgZalmcaaDpwbnSaeNZ9GoVSiYqNxpH+ljqacMKGooQKjXqS4pQyn5qhTqrWrIK2LrgGwdrHrsmm08rV6twa5kbot6jrsau3t7nXw+vGD8w/1nfYr+LT5O/va/HT+DAClADz/pf5b/jD+Af4R/jT+V/58/mz+QP5T/nL+0P7Y/8AALgG9AUUCoQLJAuUCdwNfBKYEpQTSA5IDpQKeA6AE1ASnBCwDxQGBAHb/if6Z/b38yPsB+1L6rvk/+ej4yvjm+Df5ofkX+pL6wfnY+Jj4+PiL+Sn6z/pz+w38n/xA/e79ff4N/5P/JQC5AE4B5wF4AggDmwMuBLgEQAXFBS0GcAaeBrsGzAYNB0kHQQe5Bm0F9wMvA8YC5gLqAowB9f+z/oz9hvyL+4/6n/m++CL6Cf31/6ABfgKQBOoF8QetCeAKwgwGDfMMhAm0Btf9/Ppv9y71KPP18azwse+97pTutu6b7vrucO/y7xXwFPAj8EPwk/Cr8MHwpfDl8WPzQvUM95347vil+eX6I/x4/cv+8P8hAU4ChgPDBP0FLAeXCGcJOAoYCwkM4AxlDbgN7g0UDh4O/w3QDV0NCQ2dDCcMnwsWC4IK7QlXCccINgjIBLcBNf8N/QH7FfmR9w32XfXS9Jf0dfRw9I30xfT59ED1nfXp9S72f/al9hP4P/o7/Jr9ZAEoA4YF6Ac0CW0KuAvIDAgOPA8+EC8RPhJGEywUFBUFFtEWwReHGE8ZIRrfGqkbiRxAHfQdkx4pH7QfPSCrIBYhhSHfISgiJiJPIl0ibCJ4IogijiKWIoYieCI9IP8ehhziGawV+RRqE/YRxRDKD98O+g0MDR8MQQuJCsYJ+AgZCCQHPQZTBW8EjgOuAs8B3wBuAJ7/o/7c/QP9DPwq+0X6ZfmR+Mn3/vZ19vv1kfUn9e708fS39I/0bvRP9Eb0RfRZ9I30xPQO9Xf14PUf9in3dvc29/P3nPht+S/6+Pq4+377uPu5+xf7IfwC+6/8rP08/kX/JwCaANQAaQEzArwCQQPFA0EE5AR0BekFXwbEBhEHZweuB+sHLAhBCGsIUQiJCGkIKgjZB4sHOQfjBosGSAbHBWwF8ARuBPED/gLpAfcAHQAw/xL+tPxn+9r72v3S/soA/AFTAsMCyALnArAChgIvAv0BuQFqARcBvgBwAAAAW/7//TP91vye/I38c/xn/GP8bfyO/MT8/Pw//Wz9c/1h/XT9lf2v/br9MP7T/gb/JP9h/0j/Wv91/3n/jP+c/6L/rP8AALA+HgA4AGkAmQDAANUA9wAcAS0BRQFVAXABgAGPAcJ/JwIRA+ICUQOhA1IEgQTjBNIEQgRqBAIEvANoA/QCiQI0ArwBSwHbAGMAEQC3/17/Gv/K/qL+Zv5F/gj+6P3j/af9qf2S/X/9df1a/Uv9P/0x/Sr9IP0a/Q39B/0C/fv8+Pzz/PL87vzs/Ob85Pzi/OD83/ze/N382vzZ/Nf81vzX/Nf82fza/N/85fzl/OX85fzl/OX85fzl/OX85Pzk/OT85Pzk/OT85Pzk/OT85Pzk/OT85Pzk/OT85Pzk/OT85Pzk/OT85Pzk/OT85Pzk/OT85Pzk/OT85Pzk/OT85Pzk/OT85Pzk/OT85Pzk/OT85Pzk/OT85PzkAK4A</audio>
+    <audio id="loseSound" src="data:audio/wav;base64,UklGRpIDAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YW4DAACBgIGAgX+Bf4F+gX6AfoB9f31/fH98fnx9e318fHx7e3t7ent6e3p7eXp5eXl4eXh5eHh3d3d2d3Z2dXZ1dXR0c3NzcnNycnFycXFwcHBvb25vbm9ub25tbW1sbWxsGoT2RfeF+In5E/qt+in7ovtM/Pr8p/1W/hD/0/+ZAF8BMgK5AlkDAgSxBGIF+gWNBhQHiQfqB04ItQgZCYEJ6wlXCtYKMwuGC9gLIwxzDMMM9gweDUANVw1tDXUNeA1wDWgNXA1FDSkNCw3nDMMMlgxqDEIMHgz2C84LpAt+C1ULKgsBEjsTdBSPFasWuRfFGMwZ1RrkG+4c8R3sHugf5SDZIY8iQCLpIT0KGAM3AHcAsgFABNcGgQlGDGgO4g/WEPQQ2g+YDSQKFgZ1AI/7HPeN8kjuheq06JXnded+6DbrMu9W9MD5YP8MBfUJjA1HD+4PHQ87DbMJYgXDAfn9/vpH+M71mvTh88D07PZ0+Sr8pf5sAdsC/AP9BO8EQgblBnEHmggdCqIKJwuFC7ULowuWCxoLIwtoClUJ+wcxBnQEsALPANX+9vxO+1L6//n8+V76lftZ/XL/3gBlAtUD5wQSBSYFzQQYBF4DjQKJAYEAg/+d/vP9hvxz+XP3tPYI9pj2Wvff+Mz6o/yd/nr/XgDx/5n+9fyr+wv7Svsm/PP9fP/mAOQBrQIzA4wDqgOU7hTvHvAj8Q7yBvMO9Aj1GvYV9xH4GPkc+iH7KPwx/Tr+Ov84AEcBPwI3AzMEMwUyBjUHOghACT4KPAs9DD0NPg4/D0AQQBFBEkQTRRNAEzsTNBMtEyYTHxMYExATCRMAE/YS6<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simple iPad Ping Pong</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #222;
+            font-family: Arial, sans-serif;
+            touch-action: none; /* Prevent default touch actions */
+        }
+        
+        #gameArea {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100vh;
+            touch-action: none; /* Prevent scrolling */
+        }
+        
+        #gameCanvas {
+            background-color: #000;
+            border: 2px solid #444;
+            border-radius: 8px;
+            touch-action: none;
+        }
+        
+        #scoreBoard {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        
+        #startButton {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 20px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        
+        #soundToggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .instructions {
+            color: #aaa;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        #gameOverModal {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.85);
+            border: 2px solid #555;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+            z-index: 100;
+        }
+        
+        #gameOverTitle {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        #gameOverMessage {
+            color: #ddd;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        #restartButton {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 12px 28px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="gameArea">
+        <div id="scoreBoard">Player: 0 | AI: 0</div>
+        <canvas id="gameCanvas" width="400" height="300"></canvas>
+        <button id="startButton">Start Game</button>
+        <div class="instructions">
+            Tap and drag up/down on the game area to move your paddle
+        </div>
+    </div>
+    
+    <div id="gameOverModal">
+        <div id="gameOverTitle">Game Over!</div>
+        <div id="gameOverMessage">Message goes here</div>
+        <button id="restartButton">Play Again</button>
+    </div>
+    
+    <script>
+        // Initialize game elements
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreBoard = document.getElementById('scoreBoard');
+        const startButton = document.getElementById('startButton');
+        const soundToggle = document.getElementById('soundToggle');
+        
+        // Sound elements
+        const paddleHitSound = document.getElementById('paddleHitSound');
+        const wallHitSound = document.getElementById('wallHitSound');
+        const scoreSound = document.getElementById('scoreSound');
+        const winSound = document.getElementById('winSound');
+        const loseSound = document.getElementById('loseSound');
+        
+        // Sound control
+        let soundEnabled = true;
+        
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+        }
+        
+        soundToggle.addEventListener('click', toggleSound);
+        
+        // Play sounds with volume control
+        function playSound(sound) {
+            if (soundEnabled) {
+                sound.volume = 0.3; // Lower volume to 30%
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log("Audio play error:", e));
+            }
+        }
+        
+        // Make canvas responsive
+        function resizeCanvas() {
+            const maxWidth = window.innerWidth * 0.9;
+            const maxHeight = window.innerHeight * 0.6;
+            
+            // Calculate aspect ratio
+            const aspectRatio = canvas.width / canvas.height;
+            
+            // Determine new dimensions while maintaining aspect ratio
+            let newWidth = maxWidth;
+            let newHeight = newWidth / aspectRatio;
+            
+            if (newHeight > maxHeight) {
+                newHeight = maxHeight;
+                newWidth = newHeight * aspectRatio;
+            }
+            
+            // Set canvas display size
+            canvas.style.width = newWidth + 'px';
+            canvas.style.height = newHeight + 'px';
+        }
+        
+        // Call resize on load and window resize
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        
+        // Game variables
+        let gameRunning = false;
+        let playerScore = 0;
+        let aiScore = 0;
+        let lastTime = 0;
+        let animationId = null;
+        
+        // Game settings
+        const winningScore = 10;
+        
+        // Game objects
+        const paddleWidth = 10;
+        const paddleHeight = 60;
+        const ballSize = 10;
+        
+        const player = {
+            x: 20,
+            y: canvas.height / 2 - paddleHeight / 2,
+            width: paddleWidth,
+            height: paddleHeight,
+            color: '#4CAF50',
+            speed: 5
+        };
+        
+        const ai = {
+            x: canvas.width - 30,
+            y: canvas.height / 2 - paddleHeight / 2,
+            width: paddleWidth,
+            height: paddleHeight,
+            color: '#F44336',
+            speed: 3
+        };
+        
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            size: ballSize,
+            speed: 4,
+            dx: 4,
+            dy: 4,
+            color: 'white'
+        };
+        
+        // Add confetti effect for winners
+        function createConfetti() {
+            const confettiCount = 100;
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    if (!gameRunning) {
+                        const confetti = document.createElement('div');
+                        confetti.className = 'confetti-piece';
+                        confetti.style.position = 'absolute';
+                        confetti.style.width = Math.random() * 10 + 5 + 'px';
+                        confetti.style.height = Math.random() * 10 + 5 + 'px';
+                        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.left = Math.random() * window.innerWidth + 'px';
+                        confetti.style.top = -20 + 'px';
+                        confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                        confetti.style.zIndex = '50';
+                        document.body.appendChild(confetti);
+                        
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = Math.random() * 5 + 2;
+                        let posY = -20;
+                        
+                        const animation = setInterval(() => {
+                            posY += speed;
+                            confetti.style.transform = `translate(${Math.sin(angle) * 10}px, ${posY}px) rotate(${posY}deg)`;
+                            confetti.style.opacity = (1000 - posY) / 1000;
+                            
+                            if (posY > window.innerHeight) {
+                                clearInterval(animation);
+                                if (confetti.parentNode) {
+                                    document.body.removeChild(confetti);
+                                }
+                            }
+                        }, 20);
+                    }
+                }, i * 50);
+            }
+        }
+        
+        // Touch controls
+        let touchY = null;
+        
+        function handleStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            touchY = (touch.clientY - rect.top) * (canvas.height / rect.height);
+        }
+        
+        function handleMove(e) {
+            e.preventDefault();
+            if (!gameRunning) return;
+            
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            touchY = (touch.clientY - rect.top) * (canvas.height / rect.height);
+        }
+        
+        function handleEnd(e) {
+            e.preventDefault();
+            touchY = null;
+        }
+        
+        // Add touch event listeners
+        canvas.addEventListener('touchstart', handleStart, false);
+        canvas.addEventListener('touchmove', handleMove, false);
+        canvas.addEventListener('touchend', handleEnd, false);
+        canvas.addEventListener('touchcancel', handleEnd, false);
+        
+        // Game drawing functions
+        function drawRect(x, y, width, height, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, width, height);
+        }
+        
+        function drawCircle(x, y, radius, color) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        function drawNet() {
+            const netWidth = 2;
+            const netSegmentHeight = 10;
+            const gap = 8;
+            
+            ctx.fillStyle = '#777';
+            for (let y = 0; y < canvas.height; y += netSegmentHeight + gap) {
+                drawRect(canvas.width / 2 - netWidth / 2, y, netWidth, netSegmentHeight, '#777');
+            }
+        }
+        
+        // Game logic
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
+            ball.dx = ball.dx > 0 ? -4 : 4;
+            ball.dy = Math.random() > 0.5 ? 4 : -4;
+        }
+        
+        function updatePlayerPosition() {
+            if (!gameRunning) return;
+            
+            if (touchY !== null) {
+                // Calculate target position (centered on touch)
+                const targetY = touchY - player.height / 2;
+                
+                // Add smooth movement with easing
+                const easing = 0.3; // Adjust for feel (0-1)
+                player.y += (targetY - player.y) * easing;
+                
+                // Clamp to canvas boundaries
+                if (player.y < 0) player.y = 0;
+                if (player.y + player.height > canvas.height) player.y = canvas.height - player.height;
+            }
+        }
+        
+        function updateAiPosition() {
+            if (!gameRunning) return;
+            
+            // Make AI imperfect - 75% chance to move correctly
+            if (Math.random() < 0.75) {
+                const aiCenter = ai.y + ai.height / 2;
+                const ballCenter = ball.y;
+                
+                // Only chase ball when ball moves toward AI
+                if (ball.dx > 0) {
+                    if (aiCenter < ballCenter - 10) {
+                        ai.y += ai.speed;
+                    } else if (aiCenter > ballCenter + 10) {
+                        ai.y -= ai.speed;
+                    }
+                }
+            }
+            
+            // Clamp to canvas boundaries
+            if (ai.y < 0) ai.y = 0;
+            if (ai.y + ai.height > canvas.height) ai.y = canvas.height - ai.height;
+        }
+        
+        function updateBallPosition(deltaTime) {
+            // Move ball
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+            
+            // Top and bottom collisions
+            if (ball.y - ball.size / 2 < 0 || ball.y + ball.size / 2 > canvas.height) {
+                ball.dy = -ball.dy;
+            }
+            
+            // Player paddle collision
+            if (
+                ball.x - ball.size / 2 < player.x + player.width &&
+                ball.x + ball.size / 2 > player.x &&
+                ball.y + ball.size / 2 > player.y &&
+                ball.y - ball.size / 2 < player.y + player.height
+            ) {
+                // Ensure ball is in front of the paddle to prevent sticking
+                ball.x = player.x + player.width + ball.size / 2;
+                ball.dx = -ball.dx;
+                
+                // Adjust angle based on where it hit the paddle
+                const hitPosition = (ball.y - (player.y + player.height / 2)) / (player.height / 2);
+                ball.dy = hitPosition * 6; // Adjust for more/less angle
+            }
+            
+            // AI paddle collision
+            if (
+                ball.x - ball.size / 2 < ai.x + ai.width &&
+                ball.x + ball.size / 2 > ai.x &&
+                ball.y + ball.size / 2 > ai.y &&
+                ball.y - ball.size / 2 < ai.y + ai.height
+            ) {
+                // Ensure ball is in front of the paddle
+                ball.x = ai.x - ball.size / 2;
+                ball.dx = -ball.dx;
+                
+                // Adjust angle based on where it hit
+                const hitPosition = (ball.y - (ai.y + ai.height / 2)) / (ai.height / 2);
+                ball.dy = hitPosition * 6;
+            }
+            
+            // Left and right collisions (scoring)
+            if (ball.x - ball.size / 2 < 0) {
+                aiScore++;
+                updateScoreBoard();
+                playSound(scoreSound);
+                
+                if (aiScore >= winningScore) {
+                    playSound(loseSound);
+                }
+                
+                if (aiScore < winningScore) {
+                    resetBall();
+                }
+            } else if (ball.x + ball.size / 2 > canvas.width) {
+                playerScore++;
+                updateScoreBoard();
+                playSound(scoreSound);
+                
+                if (playerScore >= winningScore) {
+                    playSound(winSound);
+                }
+                
+                if (playerScore < winningScore) {
+                    resetBall();
+                }
+            }
+        }
+        
+        function updateScoreBoard() {
+            scoreBoard.textContent = `Player: ${playerScore} | AI: ${aiScore}`;
+            
+            // Check for win condition
+            if (playerScore >= winningScore || aiScore >= winningScore) {
+                gameRunning = false;
+                showGameOverModal();
+            }
+        }
+        
+        function showGameOverModal() {
+            const modal = document.getElementById('gameOverModal');
+            const title = document.getElementById('gameOverTitle');
+            const message = document.getElementById('gameOverMessage');
+            const button = document.getElementById('restartButton');
+            
+            if (playerScore >= winningScore) {
+                // Player wins
+                title.textContent = "Congratulations!";
+                message.textContent = `You won with a score of ${playerScore}-${aiScore}!`;
+                button.textContent = "Play Again";
+                title.style.color = "#4CAF50"; // Green
+                // Add celebration effect
+                createConfetti();
+            } else {
+                // AI wins
+                title.textContent = "Better Luck Next Time!";
+                message.textContent = `AI won with a score of ${aiScore}-${playerScore}.`;
+                button.textContent = "Retry";
+                title.style.color = "#F44336"; // Red
+            }
+            
+            // Show modal
+            modal.style.display = "block";
+            
+            // Cancel any ongoing animation
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+        }
+        
+        function drawGame() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background
+            drawRect(0, 0, canvas.width, canvas.height, '#222');
+            
+            // Draw net
+            drawNet();
+            
+            // Draw paddles
+            drawRect(player.x, player.y, player.width, player.height, player.color);
+            drawRect(ai.x, ai.y, ai.width, ai.height, ai.color);
+            
+            // Draw ball
+            drawCircle(ball.x, ball.y, ball.size / 2, ball.color);
+        }
+        
+        // Game loop
+        function gameLoop(timestamp) {
+            if (!gameRunning) return;
+            
+            // Calculate delta time for smooth animation
+            const deltaTime = timestamp - lastTime || 0;
+            lastTime = timestamp;
+            
+            // Update game objects
+            updatePlayerPosition();
+            updateAiPosition();
+            updateBallPosition(deltaTime);
+            
+            // Draw everything
+            drawGame();
+            
+            // Continue game loop
+            if (gameRunning) {
+                animationId = requestAnimationFrame(gameLoop);
+            }
+        }
+        
+        // Start/restart game
+        function startGame() {
+            // Clear any existing animation frame
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            
+            // Hide game over modal if visible
+            document.getElementById('gameOverModal').style.display = "none";
+            
+            // Reset scores
+            playerScore = 0;
+            aiScore = 0;
+            updateScoreBoard();
+            
+            // Reset paddles
+            player.y = canvas.height / 2 - player.height / 2;
+            ai.y = canvas.height / 2 - ai.height / 2;
+            
+            // Reset ball
+            resetBall();
+            
+            // Start game
+            gameRunning = true;
+            startButton.textContent = 'Restart Game';
+            
+            // Play start sound
+            playSound(paddleHitSound);
+            
+            // Remove any confetti elements
+            const confettiElements = document.querySelectorAll('.confetti-piece');
+            confettiElements.forEach(element => {
+                element.parentNode.removeChild(element);
+            });
+            
+            // Start game loop
+            lastTime = 0;
+            animationId = requestAnimationFrame(gameLoop);
+        }
+        
+        // Initial draw
+        drawGame();
+        
+        // Event listeners
+        startButton.addEventListener('click', startGame);
+        document.getElementById('restartButton').addEventListener('click', startGame);
+        
+        // Prevent document scrolling on touch
+        document.body.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
